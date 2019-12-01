@@ -9,6 +9,8 @@ const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
 
+
+
 // Sets up the Express App
 // =============================================================
 const app = express();
@@ -29,13 +31,13 @@ app.use(passport.session());
 // Static directory
 app.use(express.static("public"));
 
+//jobs api
+require("./jobs-api/authorization-and-authentication.js")(app);
+
 // Routes
 // =============================================================
 //require("./routes/html-routes.js")(app); // how crucial are html routes?
 require("./routes/api-routes.js")(app); //may need more api routes?
-
-//jobs api
-require("./jobs-api/authorization-and-authentication.js")(app);
 
 // Syncing our sequelize models and then starting our Express app
 // And listening for requests
