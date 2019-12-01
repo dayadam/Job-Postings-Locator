@@ -6,6 +6,8 @@
 // =============================================================
 require("dotenv").config();
 const express = require("express");
+const session = require("express-session");
+const passport = require("passport");
 
 // Sets up the Express App
 // =============================================================
@@ -19,22 +21,28 @@ const PORT = process.env.PORT || 8080;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+//initializing session
+app.use(session({ secret: "keyboard cat", resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Static directory
 app.use(express.static("public"));
 
 // Routes
 // =============================================================
 //require("./routes/html-routes.js")(app); // how crucial are html routes?
-require("./routes/api-routes.js")(app); //may need more api routes? 
+require("./routes/api-routes.js")(app); //may need more api routes?
 
-
+//jobs api
+require("./jobs-api/authorization-and-authentication.js")(app);
 
 // Syncing our sequelize models and then starting our Express app
 // And listening for requests
-// ============================================================= 
+// =============================================================
 //{ force: true }
 //db.sequelize.sync().then(function() {
-  app.listen(PORT, function() {
-    console.log("App listening on PORT " + PORT);
-  });
+app.listen(PORT, function() {
+  console.log("App listening on PORT " + PORT);
+});
 //});
