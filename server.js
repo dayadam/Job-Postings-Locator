@@ -25,14 +25,14 @@ app.use(express.static("public"));
 // Routes
 // =============================================================
 require("./routes/html-routes.js")(app); // how crucial are html routes?
-require("./routes/api-routes.js")(app); //may need more api routes? 
+require("./routes/api-routes.js")(app); //may need more api routes?
 
 // Syncing our sequelize models and then starting our Express app
 // And listening for requests
-// ============================================================= 
+// =============================================================
 //{ force: true }
 db.sequelize.sync().then(function() {
-  app.listen(PORT, function() {
-    console.log("App listening on PORT " + PORT);
-  });
+    app.listen(PORT, function() {
+        console.log("App listening on PORT " + PORT);
+    });
 });
