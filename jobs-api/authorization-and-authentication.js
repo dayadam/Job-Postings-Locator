@@ -23,13 +23,21 @@ module.exports = function(app) {
       },
       function(accessToken, refreshToken, profile, done) {
         // asynchronous verification, for effect...
-        process.nextTick(function() {
-          // To keep the example simple, the user's LinkedIn profile is returned to
-          // represent the logged-in user. In a typical application, you would want
-          // to associate the LinkedIn account with a user record in your database,
-          // and return that user instead.
-          return done(null, profile);
-        });
+        const user = {
+          //email: profile.emails[0].value,
+          //name: profile.name.givenName + " " + profile.name.familyName,
+          //id: profile.id,
+          token: accessToken
+        };
+        //process.nextTick(function() {
+        // To keep the example simple, the user's LinkedIn profile is returned to
+        // represent the logged-in user. In a typical application, you would want
+        // to associate the LinkedIn account with a user record in your database,
+        // and return that user instead.
+        //return done(null, profile);
+        //});
+        console.log(user);
+        return done(null, user);
       }
     )
   );
