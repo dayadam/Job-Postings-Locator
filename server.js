@@ -9,6 +9,8 @@ const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
 
+
+
 // Sets up the Express App
 // =============================================================
 const app = express();
@@ -21,6 +23,9 @@ const db = require("./models");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Static directory
+app.use(express.static("public"));
+
 //initializing session
 app.use(
   session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
@@ -28,11 +33,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Static directory
-app.use(express.static("public"));
-
 //jobs api
 require("./jobs-api/authorization-and-authentication.js")(app);
+
 
 // Routes
 // =============================================================

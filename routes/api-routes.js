@@ -2,6 +2,7 @@ const db = require("../models");
 //required for password encryption
 //const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const passport = require("passport");
 
 //linkedIn search
 const search = require("../jobs-api/linked-in-search.js");
@@ -9,7 +10,8 @@ const search = require("../jobs-api/linked-in-search.js");
 module.exports = function(app) {
 
   app.get("/api/job-search", function(req, res) {
-      search().jobSearch();
+      console.log(req.user);
+      //search().jobSearch();
   });
   
     // user creation

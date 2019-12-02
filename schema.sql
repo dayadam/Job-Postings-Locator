@@ -5,3 +5,7 @@ DROP DATABASE IF EXISTS joblocator;
 CREATE DATABASE joblocator;
 
 USE joblocator;
+
+SHOW TABLES;
+
+SELECT * FROM users;

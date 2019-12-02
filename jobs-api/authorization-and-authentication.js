@@ -3,7 +3,9 @@ const linkedIn = keys.linkedIn;
 const LinkedInStrategy = require("passport-linkedin-oauth2").Strategy;
 const passport = require("passport");
 
-module.exports = function(app) {
+//, db
+
+module.exports = function(app, db) {
   passport.serializeUser(function(user, done) {
     done(null, user);
   });
@@ -11,7 +13,6 @@ module.exports = function(app) {
   passport.deserializeUser(function(obj, done) {
     done(null, obj);
   });
-
   passport.use(
     new LinkedInStrategy(
       {
@@ -36,16 +37,14 @@ module.exports = function(app) {
         // and return that user instead.
         //return done(null, profile);
         //});
-        console.log(user);
+        //db.Table.create()
+        //console.log(user);
         return done(null, user);
       }
     )
   );
 
-  app.get("/auth/linkedin", passport.authenticate("linkedin"), function(
-    req,
-    res
-  ) {
+  app.get("/auth/linkedin", passport.authenticate("linkedin"), function(req,res) {
     // The request will be redirected to LinkedIn for authentication, so this
     // function will not be called.
   });
@@ -53,8 +52,9 @@ module.exports = function(app) {
   app.get(
     "/auth/linkedin/callback",
     passport.authenticate("linkedin", {
-      successRedirect: "/",
+      successRedirect: "/search.html",
       failureRedirect: "/login"
     })
   );
+  
 };
