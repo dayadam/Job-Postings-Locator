@@ -1,6 +1,7 @@
--- Drops the job_postingDB if it already exists --
-DROP DATABASE IF EXISTS Job_postingDB;
+-- Drops the joblocator if it already exists --
+DROP DATABASE IF EXISTS joblocator;
 
--- Create the database Job_postingDB and specified it for use.
-CREATE DATABASE Job_postingDB;
+-- Create the database joblocator and specified it for use.
+CREATE DATABASE joblocator;
 
+USE joblocator;

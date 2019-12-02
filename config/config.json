@@ -1,7 +1,7 @@
 {
     "development": {
         "username": "root",
-        "password": "feb31986",
+        "password": "root",
         "database": "joblocator",
         "host": "127.0.0.1",
         "dialect": "mysql",

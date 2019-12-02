@@ -1,6 +1,6 @@
 const db = require("../models");
 //required for password encryption
-const bcrypt = require("bcrypt");
+//const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 //linkedIn search
@@ -13,7 +13,7 @@ module.exports = function(app) {
   });
   
     // user creation
-    app.post("/api/user/create", function(req, res) {
+/*     app.post("/api/user/create", function(req, res) {
         bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
             db.User.create({
                 userName: req.body.userName,
@@ -23,5 +23,5 @@ module.exports = function(app) {
                 res.json(results);
             });
         });
-    });
+    }); */
 };
