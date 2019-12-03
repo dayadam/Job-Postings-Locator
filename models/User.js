@@ -17,6 +17,10 @@ module.exports = function(sequelize, DataTypes) {
             validate: {
                 isEmail: true
             }
+        },
+
+        location: {
+            type: DataTypes.STRING
         }
     });
     // custom method added to the User model. it compares the users "password" to the hashed password stored in the database
