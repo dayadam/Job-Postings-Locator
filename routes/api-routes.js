@@ -1,7 +1,6 @@
 const db = require("../models");
 //pulls in our passport file
 const passport = require("../config/passport");
-
 module.exports = function(app) {
     // user creation
     app.post("/api/signup", function(req, res) {
@@ -17,11 +16,9 @@ module.exports = function(app) {
                 res.json(err);
             });
     });
-
     // user login post authenticates using the "local" strat in the passport.js
     app.post("/api/login", passport.authenticate("local"), function(req, res) {
         //sends pac the route to redirect to if the user is "logged in"
-
         res.json("/members");
     });
     // used to get a logged in users data
@@ -37,7 +34,6 @@ module.exports = function(app) {
             });
         }
     });
-
     //logout
     app.get("/logout", function(req, res) {
         req.logout();

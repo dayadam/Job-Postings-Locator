@@ -10,6 +10,8 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
 
+
+
 // Sets up the Express App
 // =============================================================
 const app = express();
@@ -22,6 +24,9 @@ const db = require("./models");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Static directory
+app.use(express.static("public"));
+
 //initializing session
 app.use(
     session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
@@ -29,13 +34,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Static directory
-app.use(express.static("public"));
+//linkedin jobs api
+//require("./jobs-api/authorization-and-authentication.js")(app);
 
 // Routes
 // =============================================================
-
-require("./routes/html-routes.js")(app); // how crucial are html routes?
+//require("./routes/html-routes.js")(app); // how crucial are html routes?
 require("./routes/api-routes.js")(app); //may need more api routes?
 
 // Syncing our sequelize models and then starting our Express app
@@ -43,7 +47,7 @@ require("./routes/api-routes.js")(app); //may need more api routes?
 // =============================================================
 //{ force: true }
 db.sequelize.sync().then(function() {
-    app.listen(PORT, function() {
-        console.log("App listening on PORT " + PORT);
-    });
+  app.listen(PORT, function() {
+    console.log("App listening on PORT " + PORT);
+  });
 });
