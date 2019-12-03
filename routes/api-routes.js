@@ -17,13 +17,16 @@ module.exports = function(app) {
     //const URL = `https://api.linkedin.com/v2/me`;
     axios
       .post(URL, {
-        keywords: "account manager",
-        location: "London",
-        radius: "50",
-        salary: "200000",
+        keywords: "javascript",
+        location: "Atlanta",
+        radius: "25",
+        salary: "100000",
         page: "1"
       })
-      .then(x => console.log(x));
+      .then(function(answer) {
+        res.json(answer.data);
+        console.log(answer.data);
+      });
     //search().jobSearch();
     // });
     //res.json(req.user);
