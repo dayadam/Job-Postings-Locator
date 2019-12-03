@@ -40,7 +40,6 @@ module.exports = function(app) {
 
     //logout
     app.get("/logout", function(req, res) {
-        console.log("user logged out!");
         req.logout();
         res.redirect("/");
     });
