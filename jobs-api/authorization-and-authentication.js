@@ -19,7 +19,7 @@ module.exports = function(app, db) {
         clientID: linkedIn.id,
         clientSecret: linkedIn.secret,
         callbackURL: "http://localhost:8080/auth/linkedin/callback",
-        scope: ["r_emailaddress", "r_liteprofile"],
+        scope: ["r_emailaddress", "r_liteprofile", "r_JYMBII"],
         state: true
       },
       function(accessToken, refreshToken, profile, done) {
