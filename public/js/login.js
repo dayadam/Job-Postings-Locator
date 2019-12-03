@@ -24,10 +24,12 @@ $(document).ready(function() {
 });
 
 function createUser(user) {
-    $.ajax({
+    $.post({
         type: "POST",
         url: "/api/signup",
         data: user
+    }).then(function(data) {
+        window.location.replace(data);
     });
 }
 

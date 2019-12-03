@@ -10,8 +10,6 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
 
-
-
 // Sets up the Express App
 // =============================================================
 const app = express();
@@ -39,7 +37,7 @@ app.use(passport.session());
 
 // Routes
 // =============================================================
-//require("./routes/html-routes.js")(app); // how crucial are html routes?
+require("./routes/html-routes.js")(app); // how crucial are html routes?
 require("./routes/api-routes.js")(app); //may need more api routes?
 
 // Syncing our sequelize models and then starting our Express app
@@ -47,7 +45,7 @@ require("./routes/api-routes.js")(app); //may need more api routes?
 // =============================================================
 //{ force: true }
 db.sequelize.sync().then(function() {
-  app.listen(PORT, function() {
-    console.log("App listening on PORT " + PORT);
-  });
+    app.listen(PORT, function() {
+        console.log("App listening on PORT " + PORT);
+    });
 });
