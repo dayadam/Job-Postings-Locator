@@ -4,8 +4,9 @@
 // ******************************************************************************
 // *** Dependencies
 // =============================================================
-require("dotenv").config();
+const env = require("dotenv").config();
 const express = require("express");
+const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
 
@@ -28,7 +29,7 @@ app.use(express.static("public"));
 
 //initializing session
 app.use(
-  session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
+    session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
 );
 app.use(passport.initialize());
 app.use(passport.session());

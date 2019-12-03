@@ -1,11 +1,6 @@
 {
     "development": {
-        "username": "root",
-        "password": "root",
-        "database": "joblocator",
-        "host": "127.0.0.1",
-        "dialect": "mysql",
-        "operatorsAliases": false
+        "use_env_variable": "LOCAL_DB"
     },
     "test": {
         "username": "root",
@@ -24,4 +19,3 @@
         "operatorsAliases": false
     }
 }
-
