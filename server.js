@@ -33,9 +33,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-//jobs api
-require("./jobs-api/authorization-and-authentication.js")(app);
-
+//linkedin jobs api
+//require("./jobs-api/authorization-and-authentication.js")(app);
 
 // Routes
 // =============================================================
