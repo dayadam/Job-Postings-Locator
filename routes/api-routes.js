@@ -1,19 +1,14 @@
 const db = require("../models");
-//required for password encryption
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
+const passport = require("../config/passport");
 
 module.exports = function(app) {
-    // user creation
-    app.post("/api/user/create", function(req, res) {
-        bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-            db.User.create({
-                userName: req.body.userName,
-                email: req.body.email,
-                password: hash
-            }).then(function(results) {
-                res.json(results);
-            });
+    //user sign up route
+    app.post("/api/signup", function(req, res) {
+        db.User.create({
+            email: req.body.email,
+            password: req.body.password
+        }).then(function() {
+            res.json("it worked?");
         });
     });
 };
