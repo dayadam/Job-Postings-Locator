@@ -2,23 +2,34 @@ const db = require("../models");
 //required for password encryption
 //const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const passport = require("passport");
+//const passport = require("passport");
 const axios = require("axios");
 
 //linkedIn search
-const search = require("../jobs-api/linked-in-search.js");
+//const search = require("../jobs-api/linked-in-search.js");
+const keys = require("../keys.js");
+const joobleKey = keys.jooble.apiKey;
 
 module.exports = function(app) {
   app.get("/api/job-search", function(req, res) {
-    console.log(req.user);
-    const URL = `https://api.linkedin.com/v2/recommendedJobs?q=byMember`;
+    //console.log(req.user);
+    const URL = `https://jooble.org/api/${joobleKey}`;
     //const URL = `https://api.linkedin.com/v2/me`;
     axios
-      .get(URL, { headers: { Authorization: `Bearer ${req.user.token}` } })
-      .then(x => console.log(x));
+      .post(URL, {
+        keywords: "javascript",
+        location: "Atlanta",
+        radius: "25",
+        salary: "100000",
+        page: "1"
+      })
+      .then(function(answer) {
+        res.json(answer.data);
+        console.log(answer.data);
+      });
     //search().jobSearch();
     // });
-    res.json(req.user);
+    //res.json(req.user);
   });
   // user creation
   /*     app.post("/api/user/create", function(req, res) {
