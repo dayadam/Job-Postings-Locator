@@ -1,12 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Job Locator</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="heading">
+      <h2 class="title">Job Site</h2>
+      <p class="description">A map based job search powered by Jooble</p>
+    </div>
+    <select class="form-control form-control-sm">
+      <option>What</option>
+    </select>
+    <select class="form-control form-control-sm">
+      <option>Where</option>
+    </select>
+    <select class="form-control form-control-sm">
+      <option>25 mile search radius</option>
+    </select>
+    <select class="form-control form-control-sm">
+      <option>United States</option>
+    </select>
+    <select class="form-control form-control-sm">
+      <option>Full time</option>
+    </select>
+    <select class="form-control form-control-sm">
+      <option>estimated salary per year</option>
+    </select>
+    <input type="checkbox" aria-label="Checkbox for following text input" />
+    <label class="form-check-label" for="dropdownCheck">
+      Exclude staffing agencies
+    </label>
+    <div class=" simple-search">
+      <label class="check-label"> Simple Search</label>
+      <div class="search-button">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div>
+    </div>
+  </body>
 </html>
