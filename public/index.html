@@ -1,50 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Job Locator</title>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="heading">
-      <h2 class="title">Job Site</h2>
-      <p class="description">A map based job search powered by Jooble</p>
-    </div>
-    <select class="form-control form-control-sm">
-      <option>What</option>
-    </select>
-    <select class="form-control form-control-sm">
-      <option>Where</option>
-    </select>
-    <select class="form-control form-control-sm">
-      <option>25 mile search radius</option>
-    </select>
-    <select class="form-control form-control-sm">
-      <option>United States</option>
-    </select>
-    <select class="form-control form-control-sm">
-      <option>Full time</option>
-    </select>
-    <select class="form-control form-control-sm">
-      <option>estimated salary per year</option>
-    </select>
-    <input type="checkbox" aria-label="Checkbox for following text input" />
-    <label class="form-check-label" for="dropdownCheck">
-      Exclude staffing agencies
-    </label>
-    <div class=" simple-search">
-      <label class="check-label"> Simple Search</label>
-      <div class="search-button">
-        <button type="submit" class="btn btn-primary">Search</button>
-      </div>
-    </div>
-  </body>
+
+<html>
+
+<head>
+  <title>Geolocation</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <style>
+    #map {
+      height: 100%;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    function initMap() {
+      var uluru = { lat: 33.7632, lng: -84.4231 };
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: uluru
+      });
+      var array = [
+        { jobTitle: "Ops", companyName: "Coke", salaryGrade: 5, description: "fun for all", location: { lat: 33.7632, Lng: -84.4231 } }];
+      var job = array[0].jobTitle;
+      console.log(job);
+      var company = array[0].companyName;
+      var salary = array[0].salaryGrade;
+      var desc = array[0].description;
+      var atlanta = array[0].location;
+
+
+      var contentString = '<div id="content">' +
+        '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
+        '<div id="bodyContent">' +
+        '<p>' + company + '</p>' +
+        '<p>' + salary + '</p>' +
+        '<p>' + desc + '</p>'
+      '</div>' +
+        '</div>';
+
+      var infowindow = new google.maps.InfoWindow({
+        content: contentString
+      });
+
+      var marker = new google.maps.Marker({
+        position: uluru,
+        map: map,
+        title: 'Atlanta'
+      });
+      marker.addListener('click', function () {
+        infowindow.open(map, marker);
+      });
+    }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        var pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+      }, function () {
+        handleLocationError(true, infoWindow, map.getCenter());
+      });
+    } else {
+      // Browser doesn't support Geolocation
+      handleLocationError(false, infoWindow, map.getCenter());
+    }
+    
+
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+      infoWindow.setPosition(pos);
+      infoWindow.setContent(browserHasGeolocation ?
+        'Error: The Geolocation service failed.' :
+        'Error: Your browser doesn\'t support geolocation.');
+      infoWindow.open(map);
+    }
+
+  </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBC9qQqk5oXjKL6xXIPcgi525Rg9yqqXa8&callback=initMap">
+    </script>
+</body>
+
 </html>
