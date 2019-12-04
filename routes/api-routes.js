@@ -4,25 +4,29 @@ const passport = require("../config/passport");
 const axios = require("axios");
 const keys = require("../keys.js");
 const joobleKey = keys.jooble.apiKey;
-
+const googleKey = keys.google.apiKey;
+/// there keys arent loading
 module.exports = function(app) {
-  app.get("/api/job-search", function(req, res) {
-    const URL = `https://jooble.org/api/${joobleKey}`;
-    axios
-      .post(URL, {
-        keywords: "javascript",
-        location: "Atlanta",
-        radius: "25",
-        salary: "100000",
-        page: "1"
-      })
-      .then(function(answer) {
-        res.json(answer.data);
-        console.log(answer.data);
-      });
-  });
+    app.get("/api/job-search", function(req, res) {
+        const URL = `https://jooble.org/api/${joobleKey}`;
+        console.log(URL);
+        axios
+            .post(URL, {
+                keywords: "javascript",
+                location: "Atlanta",
+                radius: "25",
+                salary: "100000",
+                page: "1"
+            })
+            .then(function(answer) {
+                res.json(answer.data);
+            })
+            .catch(function(err) {
+                res.status(500).json({ err: err.message });
+            });
+    });
 
-  // user creation
+    // user creation
     app.post("/api/signup", function(req, res) {
         db.User.create({
                 email: req.body.email,
@@ -39,21 +43,24 @@ module.exports = function(app) {
 
     //get jobs
     app.get("/api/search", function(req, res) {
+        console.log(joobleKey);
         axios
-            .post("https://jooble.org/api/8be0b681-8f05-440e-8be5-f14572286ff1", {
+            .post(`https://jooble.org/api/${joobleKey}`, {
                 keywords: "account manager",
-                location: "London",
+                location: "Tampa",
                 radius: "50",
                 salary: "200000",
                 page: "1"
             })
             .then(function(response) {
-                let rawData = response.data.jobs;
-
-                const newJobs = companyToLoc(rawData);
-                newJobs.then(jobs => {
-                    res.json(jobs);
-                });
+                console.log(response.data.jobs);
+                return companyToLoc(response.data.jobs);
+            })
+            .then(function(jobs) {
+                res.json(jobs);
+            })
+            .catch(function(err) {
+                res.status(500).json({ err: err.message });
             });
     });
 
@@ -82,24 +89,28 @@ module.exports = function(app) {
     });
 
     async function companyToLoc(jobs) {
+        const locationRequests = [];
         for (let i = 0; i < jobs.length; i++) {
-            let location = {};
-            const urlString =
-                "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=" +
-                jobs[i].company +
-                "&inputtype=textquery&fields=formatted_address,name,rating,opening_hours,geometry&key=AIzaSyD55BLnIxH-0YxxKYDu2PpsYSGYEk4Xt4Q";
-            await axios.get(urlString).then(function(response) {
-                location.address = response.data.candidates[0].formatted_address;
-                //console.log(response.data.candidates[0].formatted_address);
-                //location.loc = response.data.candidates[0].geometry.location.lat;
-                location.lat = response.data.candidates[0].geometry.location.lat;
-                location.lng = response.data.candidates[0].geometry.location.lng;
-                //console.log(response.data.candidates[0].geometry.location);
+            const companyName = encodeURI(jobs[i].company);
+            const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName}&inputtype=textquery&fields=formatted_address,name,rating,opening_hours,geometry&locationbias=circle:2000@27.9506,-82.4572&key=${googlekey}`;
+
+            const locationReq = axios.get(urlString).then(function(response) {
+                let location = {};
+                console.log(response.data.status);
+                if (response.data.status !== "ZERO_RESULTS") {
+                    location.address = response.data.candidates[0].formatted_address;
+                    location.lat = response.data.candidates[0].geometry.location.lat;
+                    location.lng = response.data.candidates[0].geometry.location.lng;
+                }
+
+                return location;
             });
-            jobs[i].location = location;
+            locationRequests.push(locationReq);
         }
-        // )
-        //console.log();
+        const locations = await Promise.all(locationRequests);
+        for (let i = 0; i < locations.length; i++) {
+            jobs[i].location = locations[i];
+        }
         return jobs;
     }
 };
