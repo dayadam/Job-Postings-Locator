@@ -3,7 +3,7 @@ $(document).ready(function() {
     event.preventDefault();
     const user = {};
     user.email = $("input[name='email']", this).val();
-    user.password = $("input[name='email']", this).val();
+    user.password = $("input[name='password']", this).val();
     //make sure they filled out the form
     if (!user.email || !user.password) {
       return;
@@ -17,16 +17,39 @@ $(document).ready(function() {
     event.preventDefault();
     const user = {};
     user.email = $("input[name='email']", this).val();
-    user.password = $("input[name='email']", this).val();
+    user.password = $("input[name='password']", this).val();
     console.log(user);
     createUser(user);
   });
 
   $(".search").click(function() {
-    $.ajax({
-      url: "http://localhost:8080/api/job-search",
-      method: "GET"
-    }).then(x => console.log(x));
+    const search = {};
+    if ($("#location").val() !== "") {
+      search.location = $("#location").val();
+    }
+    if ($("#radius").val() !== "") {
+      search.radius = $("#radius").val();
+    } else {
+      search.radius = 25;
+    }
+    if ($("#salary").val() !== "") {
+      search.salary = $("#salary").val();
+    }
+    if ($("#page").val() !== "") {
+      search.page = $("#page").val();
+    } else {
+      search.page = 1;
+    }
+    console.log(search);
+    if ($("#keywords").val() !== "") {
+      search.keywords = $("#keywords").val();
+      console.log(search);
+      $.post({
+        url: "http://localhost:8080/api/job-search",
+        method: "POST",
+        data: search
+      }).then(x => console.log(x));
+    }
   });
 });
 
