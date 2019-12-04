@@ -1,8 +1,27 @@
 const db = require("../models");
-//pulls in our passport file
 const passport = require("../config/passport");
+const axios = require("axios");
+const keys = require("../keys.js");
+const joobleKey = keys.jooble.apiKey;
+
 module.exports = function(app) {
-    // user creation
+  app.get("/api/job-search", function(req, res) {
+    const URL = `https://jooble.org/api/${joobleKey}`;
+    axios
+      .post(URL, {
+        keywords: "javascript",
+        location: "Atlanta",
+        radius: "25",
+        salary: "100000",
+        page: "1"
+      })
+      .then(function(answer) {
+        res.json(answer.data);
+        console.log(answer.data);
+      });
+  });
+
+  // user creation
     app.post("/api/signup", function(req, res) {
         db.User.create({
                 email: req.body.email,
