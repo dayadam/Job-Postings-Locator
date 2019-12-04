@@ -1,12 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+  <title>Geolocation</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <style>
+    #map {
+      height: 100%;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
+
 <body>
-    
+  <div id="map"></div>
+  <script>
+    function initMap() {
+      var uluru = { lat: 33.7632, lng: -84.4231 };
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: uluru
+      });
+      var array = [
+        { jobTitle: "Ops", companyName: "Coke", salaryGrade: 5, description: "fun for all", location: { lat: 33.7632, Lng: -84.4231 } }];
+      var job = array[0].jobTitle;
+      console.log(job);
+      var company = array[0].companyName;
+      var salary = array[0].salaryGrade;
+      var desc = array[0].description;
+      var atlanta = array[0].location;
+
+
+      var contentString = '<div id="content">' +
+        '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
+        '<div id="bodyContent">' +
+        '<p>' + company + '</p>' +
+        '<p>' + salary + '</p>' +
+        '<p>' + desc + '</p>'
+      '</div>' +
+        '</div>';
+
+      var infowindow = new google.maps.InfoWindow({
+        content: contentString
+      });
+
+      var marker = new google.maps.Marker({
+        position: uluru,
+        map: map,
+        title: 'Atlanta'
+      });
+      marker.addListener('click', function () {
+        infowindow.open(map, marker);
+      });
+    }
+  </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD55BLnIxH-0YxxKYDu2PpsYSGYEk4Xt4Q&callback=initMap">
+    </script>
 </body>
+
 </html>
