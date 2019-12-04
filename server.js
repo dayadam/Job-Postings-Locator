@@ -32,9 +32,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-//linkedin jobs api
-//require("./jobs-api/authorization-and-authentication.js")(app);
-
 // Routes
 // =============================================================
 require("./routes/html-routes.js")(app); // how crucial are html routes?
