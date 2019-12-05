@@ -27,14 +27,15 @@ app.use(express.static("public"));
 
 //initializing session
 app.use(
-    session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
+  session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
 // =============================================================
-require("./routes/html-routes.js")(app); // how crucial are html routes?
+//require("./routes/html-routes.js")(app); // how crucial are html routes?
+
 require("./routes/api-routes.js")(app); //may need more api routes?
 
 // Syncing our sequelize models and then starting our Express app
@@ -42,7 +43,7 @@ require("./routes/api-routes.js")(app); //may need more api routes?
 // =============================================================
 //{ force: true }
 db.sequelize.sync().then(function() {
-    app.listen(PORT, function() {
-        console.log("App listening on PORT " + PORT);
-    });
+  app.listen(PORT, function() {
+    console.log("App listening on PORT " + PORT);
+  });
 });

@@ -1,11 +1,3 @@
-// *********************************************************************************
-// api-routes.js - this file offers a set of routes for displaying and saving data to the db
-// *********************************************************************************
-​
-// Dependencies
-// =============================================================
-​
-// Requiring our Todo model
 const db = require("../models");
 const passport = require("../config/passport");
 const axios = require("axios");
@@ -17,13 +9,16 @@ module.exports = function(app) {
     const URL = `https://jooble.org/api/${joobleKey}`;
 
     axios
-      .post(URL, /* {
+      .post(
+        URL,
+        /* {
         keywords: "javascript",
         location: "Atlanta",
         radius: "25",
         salary: "100000",
         page: "1"
-      } */ req.body)
+      } */ req.body
+      )
       .then(function(answer) {
         res.json(answer.data);
         console.log(answer.data);
