@@ -7,20 +7,25 @@ const googleKey = process.env.GOOGLE_API_KEY;
 
 module.exports = function(app) {
     //get jobs with location data
-    app.get("/api/search", function(req, res) {
-        const city = "Atlanta";
+    app.put("/api/search", function(req, res) {
+        console.log(req.body);
+        const searchLoc = req.body.location;
         axios
             .post(`https://jooble.org/api/${joobleKey}`, {
-                keywords: "Front End Developer",
-                location: "Atlanta",
-                radius: "50",
+                keywords: req.body.keywords,
+                location: req.body.location,
+                radius: req.body.radius,
 
                 page: "1",
                 searchMode: "1"
             })
             .then(function(response) {
-                console.log(response.data.jobs);
-                return companyToLoc(response.data.jobs, city);
+                return companyToLoc(
+                    res,
+                    response.data.jobs,
+                    searchLoc,
+                    req.body.keywords
+                );
             })
             .then(function(jobs) {
                 res.json(jobs);
@@ -35,7 +40,7 @@ module.exports = function(app) {
         console.log(URL);
         axios
             .post(URL, {
-                keywords: "javascript",
+                keywords: "manager",
                 location: "Atlanta",
                 radius: "25",
                 salary: "100000",
@@ -45,7 +50,7 @@ module.exports = function(app) {
                 res.json(answer.data);
             })
             .catch(function(err) {
-                res.status(500).json({ err: err.message });
+                res.json("hello!");
             });
     });
 
@@ -62,6 +67,12 @@ module.exports = function(app) {
                 console.log(err);
                 res.json(err);
             });
+    });
+    //test route
+    app.get("/api/test", function(req, res) {
+        db.Search.findOne({ where: { id: 1 } }).then(function(response) {
+            res.json(JSON.parse(response.jobs));
+        });
     });
 
     // user login post authenticates using the "local" strat in the passport.js
@@ -88,12 +99,18 @@ module.exports = function(app) {
         res.redirect("/");
     });
 
-    async function companyToLoc(jobs, city) {
+    async function companyToLoc(res, jobs, searchLoc, keywords) {
         const locationRequests = [];
+        let timer = false;
 
+        setTimeout(function() {
+            if (timer === false) {
+                getCacheData(res);
+            }
+        }, 20000);
         for (let i = 0; i < jobs.length; i++) {
             const companyName = encodeURI(jobs[i].company);
-            const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName},${city}&inputtype=textquery&fields=formatted_address,geometry&key=${googleKey}`;
+            const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName},${searchLoc}&inputtype=textquery&fields=formatted_address,geometry&key=${googleKey}`;
 
             const locationReq = axios.get(urlString).then(function(response) {
                 let location = {};
@@ -112,6 +129,25 @@ module.exports = function(app) {
         for (let i = 0; i < locations.length; i++) {
             jobs[i].location = locations[i];
         }
+        timer = true;
+        createCacheData(keywords, searchLoc, jobs);
         return jobs;
+    }
+
+    function getCacheData(res) {
+        db.Search.findOne({ where: { id: 1 } }).then(function(response) {
+            res.json(JSON.parse(response.jobs));
+        });
+    }
+
+    function createCacheData(keywords, searchLoc, jobs) {
+        console.log(jobs);
+        const jobsData = JSON.stringify(jobs);
+        console.log(jobsData);
+        db.Search.create({
+            search: keywords,
+            location: searchLoc,
+            jobs: jobs
+        });
     }
 };
