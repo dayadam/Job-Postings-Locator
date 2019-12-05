@@ -2,7 +2,7 @@ const db = require("../models");
 
 const passport = require("../config/passport");
 const axios = require("axios");
-const keys = require("../keys");
+
 const joobleKey = process.env.JOOBLE_API;
 const googleKey = process.env.GOOGLE_API;
 
@@ -43,6 +43,7 @@ module.exports = function(app) {
 
     //get jobs
     app.get("/api/search", function(req, res) {
+        const city = "Atlanta";
         axios
             .post(`https://jooble.org/api/${joobleKey}`, {
                 keywords: "Front End Developer",
@@ -87,17 +88,16 @@ module.exports = function(app) {
         res.redirect("/");
     });
 
-    async function companyToLoc(jobs) {
-        const city = "Atlanta";
+    async function companyToLoc(jobs, city) {
         const locationRequests = [];
-        console.log(googleKey);
+
         for (let i = 0; i < jobs.length; i++) {
             const companyName = encodeURI(jobs[i].company);
             const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName},${city}&inputtype=textquery&fields=formatted_address,geometry&key=${googleKey}`;
-            console.log(urlString);
+
             const locationReq = axios.get(urlString).then(function(response) {
                 let location = {};
-                console.log(response.data.status);
+
                 if (response.data.status !== "ZERO_RESULTS") {
                     location.address = response.data.candidates[0].formatted_address;
                     location.lat = response.data.candidates[0].geometry.location.lat;
