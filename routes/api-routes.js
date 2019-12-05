@@ -6,9 +6,7 @@ const joobleKey = process.env.JOOBLE_API;
 const googleKey = process.env.GOOGLE_API;
 
 module.exports = function(app) {
-
-
-    //get jobs
+    //get jobs with location data
     app.get("/api/search", function(req, res) {
         const city = "Atlanta";
         axios
@@ -21,6 +19,7 @@ module.exports = function(app) {
                 searchMode: "1"
             })
             .then(function(response) {
+                console.log(response.data.jobs);
                 return companyToLoc(response.data.jobs, city);
             })
             .then(function(jobs) {
@@ -30,64 +29,64 @@ module.exports = function(app) {
                 res.status(500).json({ err: err.message });
             });
     });
-  app.post("/api/job-search", function(req, res) {
-    const URL = `https://jooble.org/api/${joobleKey}`;
+    //get jobs without location data
+    app.get("/api/job-search", function(req, res) {
+        const URL = `https://jooble.org/api/${joobleKey}`;
+        console.log(URL);
+        axios
+            .post(URL, {
+                keywords: "javascript",
+                location: "Atlanta",
+                radius: "25",
+                salary: "100000",
+                page: "1"
+            })
+            .then(function(answer) {
+                res.json(answer.data);
+            })
+            .catch(function(err) {
+                res.status(500).json({ err: err.message });
+            });
+    });
 
-    axios
-      .post(URL, /* {
-        keywords: "javascript",
-        location: "Atlanta",
-        radius: "25",
-        salary: "100000",
-        page: "1"
-      } */ req.body)
-      .then(function(answer) {
-        res.json(answer.data);
-        console.log(answer.data);
-      });
-  });
+    // user creation
+    app.post("/api/signup", function(req, res) {
+        db.User.create({
+                email: req.body.email,
+                password: req.body.password
+            })
+            .then(function() {
+                res.redirect(307, "/api/login");
+            })
+            .catch(function(err) {
+                console.log(err);
+                res.json(err);
+            });
+    });
 
-  // user creation
-  app.post("/api/signup", function(req, res) {
-    db.User.create({
-      email: req.body.email,
-      password: req.body.password
-    })
-      .then(function() {
-        res.redirect(307, "/api/login");
-      })
-      .catch(function(err) {
-        console.log(err);
-        res.json(err);
-      });
-  });
-
-
-
-  // user login post authenticates using the "local" strat in the passport.js
-  app.post("/api/login", passport.authenticate("local"), function(req, res) {
-    //sends pac the route to redirect to if the user is "logged in"
-    res.json("/members");
-  });
-  // used to get a logged in users data
-  app.get("/api/user_data", function(req, res) {
-    //send empty json if no user is logged in
-    if (!req.user) {
-      res.json({});
-    } else {
-      res.json({
-        email: req.user.email,
-        id: req.user.id,
-        location: req.user.location
-      });
-    }
-  });
-  //logout
-  app.get("/logout", function(req, res) {
-    req.logout();
-    res.redirect("/");
-  });
-
+    // user login post authenticates using the "local" strat in the passport.js
+    app.post("/api/login", passport.authenticate("local"), function(req, res) {
+        //sends pac the route to redirect to if the user is "logged in"
+        res.json("/members");
+    });
+    // used to get a logged in users data
+    app.get("/api/user_data", function(req, res) {
+        //send empty json if no user is logged in
+        if (!req.user) {
+            res.json({});
+        } else {
+            res.json({
+                email: req.user.email,
+                id: req.user.id,
+                location: req.user.location
+            });
+        }
+    });
+    //logout
+    app.get("/logout", function(req, res) {
+        req.logout();
+        res.redirect("/");
+    });
 
     async function companyToLoc(jobs, city) {
         const locationRequests = [];
@@ -114,10 +113,5 @@ module.exports = function(app) {
             jobs[i].location = locations[i];
         }
         return jobs;
-
     }
-    // )
-    //console.log();
-    return jobs;
-  }
 };
