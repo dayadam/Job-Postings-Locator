@@ -1,105 +1,117 @@
 const db = require("../models");
 const passport = require("../config/passport");
 const axios = require("axios");
-const keys = require("../keys.js");
-const joobleKey = keys.jooble.apiKey;
+
+const joobleKey = process.env.JOOBLE_API_KEY;
+const googleKey = process.env.GOOGLE_API_KEY;
 
 module.exports = function(app) {
-  app.post("/api/job-search", function(req, res) {
-    const URL = `https://jooble.org/api/${joobleKey}`;
+    //get jobs with location data
+    app.get("/api/search", function(req, res) {
+        const city = "Atlanta";
+        axios
+            .post(`https://jooble.org/api/${joobleKey}`, {
+                keywords: "Front End Developer",
+                location: "Atlanta",
+                radius: "50",
 
-    axios
-      .post(URL, /* {
-        keywords: "javascript",
-        location: "Atlanta",
-        radius: "25",
-        salary: "100000",
-        page: "1"
-      } */ req.body)
-      .then(function(answer) {
-        res.json(answer.data);
-        console.log(answer.data);
-      });
-  });
+                page: "1",
+                searchMode: "1"
+            })
+            .then(function(response) {
+                console.log(response.data.jobs);
+                return companyToLoc(response.data.jobs, city);
+            })
+            .then(function(jobs) {
+                res.json(jobs);
+            })
+            .catch(function(err) {
+                res.status(500).json({ err: err.message });
+            });
+    });
+    //get jobs without location data
+    app.get("/api/job-search", function(req, res) {
+        const URL = `https://jooble.org/api/${joobleKey}`;
+        console.log(URL);
+        axios
+            .post(URL, {
+                keywords: "javascript",
+                location: "Atlanta",
+                radius: "25",
+                salary: "100000",
+                page: "1"
+            })
+            .then(function(answer) {
+                res.json(answer.data);
+            })
+            .catch(function(err) {
+                res.status(500).json({ err: err.message });
+            });
+    });
 
-  // user creation
-  app.post("/api/signup", function(req, res) {
-    db.User.create({
-      email: req.body.email,
-      password: req.body.password
-    })
-      .then(function() {
-        res.redirect(307, "/api/login");
-      })
-      .catch(function(err) {
-        console.log(err);
-        res.json(err);
-      });
-  });
+    // user creation
+    app.post("/api/signup", function(req, res) {
+        db.User.create({
+                email: req.body.email,
+                password: req.body.password
+            })
+            .then(function() {
+                res.redirect(307, "/api/login");
+            })
+            .catch(function(err) {
+                console.log(err);
+                res.json(err);
+            });
+    });
 
-  //get jobs
-  app.get("/api/search", function(req, res) {
-    axios
-      .post(`https://jooble.org/api/${joobleKey}`, {
-        keywords: "account manager",
-        location: "London",
-        radius: "50",
-        salary: "200000",
-        page: "1"
-      })
-      .then(function(response) {
-        let rawData = response.data.jobs;
+    // user login post authenticates using the "local" strat in the passport.js
+    app.post("/api/login", passport.authenticate("local"), function(req, res) {
+        //sends pac the route to redirect to if the user is "logged in"
+        res.json("/members");
+    });
+    // used to get a logged in users data
+    app.get("/api/user_data", function(req, res) {
+        //send empty json if no user is logged in
+        if (!req.user) {
+            res.json({});
+        } else {
+            res.json({
+                email: req.user.email,
+                id: req.user.id,
+                location: req.user.location
+            });
+        }
+    });
+    //logout
+    app.get("/logout", function(req, res) {
+        req.logout();
+        res.redirect("/");
+    });
 
-        const newJobs = companyToLoc(rawData);
-        newJobs.then(jobs => {
-          res.json(jobs);
-        });
-      });
-  });
+    async function companyToLoc(jobs, city) {
+        const locationRequests = [];
 
-  // user login post authenticates using the "local" strat in the passport.js
-  app.post("/api/login", passport.authenticate("local"), function(req, res) {
-    //sends pac the route to redirect to if the user is "logged in"
-    res.json("/members");
-  });
-  // used to get a logged in users data
-  app.get("/api/user_data", function(req, res) {
-    //send empty json if no user is logged in
-    if (!req.user) {
-      res.json({});
-    } else {
-      res.json({
-        email: req.user.email,
-        id: req.user.id,
-        location: req.user.location
-      });
+        for (let i = 0; i < jobs.length; i++) {
+            const companyName = encodeURI(jobs[i].company);
+            const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName},${city}&inputtype=textquery&fields=formatted_address,geometry&key=${googleKey}`;
+
+            const locationReq = axios.get(urlString).then(function(response) {
+                let location = {};
+
+                if (response.data.status !== "ZERO_RESULTS") {
+                    location.address = response.data.candidates[0].formatted_address;
+                    location.lat = response.data.candidates[0].geometry.location.lat;
+                    location.lng = response.data.candidates[0].geometry.location.lng;
+                }
+
+                return location;
+            });
+            locationRequests.push(locationReq);
+        }
+        const locations = await Promise.all(locationRequests);
+        for (let i = 0; i < locations.length; i++) {
+            jobs[i].location = locations[i];
+        }
+        return jobs;
     }
-  });
-  //logout
-  app.get("/logout", function(req, res) {
-    req.logout();
-    res.redirect("/");
-  });
-
-  async function companyToLoc(jobs) {
-    for (let i = 0; i < jobs.length; i++) {
-      let location = {};
-      const urlString =
-        "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=" +
-        jobs[i].company +
-        "&inputtype=textquery&fields=formatted_address,name,rating,opening_hours,geometry&key=AIzaSyD55BLnIxH-0YxxKYDu2PpsYSGYEk4Xt4Q";
-      await axios.get(urlString).then(function(response) {
-        location.address = response.data.candidates[0].formatted_address;
-        //console.log(response.data.candidates[0].formatted_address);
-        //location.loc = response.data.candidates[0].geometry.location.lat;
-        location.lat = response.data.candidates[0].geometry.location.lat;
-        location.lng = response.data.candidates[0].geometry.location.lng;
-        //console.log(response.data.candidates[0].geometry.location);
-      });
-      jobs[i].location = location;
-    }
-    // )
-    //console.log();
-    return jobs;
-  }
 };
