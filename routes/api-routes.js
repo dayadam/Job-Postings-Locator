@@ -8,7 +8,6 @@ const googleKey = process.env.GOOGLE_API_KEY;
 module.exports = function(app) {
     //get jobs with location data
     app.put("/api/search", function(req, res) {
-        console.log(req.body);
         const searchLoc = req.body.location;
         axios
             .post(`https://jooble.org/api/${joobleKey}`, {
@@ -105,7 +104,7 @@ module.exports = function(app) {
 
         setTimeout(function() {
             if (timer === false) {
-                getCacheData(res);
+                getCacheData(res, searchLoc, keywords, jobs);
             }
         }, 20000);
         for (let i = 0; i < jobs.length; i++) {
@@ -134,20 +133,27 @@ module.exports = function(app) {
         return jobs;
     }
 
-    function getCacheData(res) {
-        db.Search.findOne({ where: { id: 1 } }).then(function(response) {
-            res.json(JSON.parse(response.jobs));
+    function getCacheData(res, searchLoc, keyword, jobs) {
+        const fixedLoc = searchLoc.toLowerCase();
+        const fixedKeyword = keyword.toLowerCase();
+        db.Search.findOne({
+            where: { location: fixedLoc, search: fixedKeyword }
+        }).then(function(response) {
+            if (response) {
+                res.json(JSON.parse(response.jobs));
+            } else {
+                res.json(jobs);
+            }
         });
     }
 
     function createCacheData(keywords, searchLoc, jobs) {
         console.log(jobs);
-        const jobsData = JSON.stringify(jobs);
-        console.log(jobsData);
+
         db.Search.create({
-            search: keywords,
+            search: keywords.toLowerCase(),
             location: searchLoc,
-            jobs: jobs
+            jobs: JSON.stringify(jobs)
         });
     }
 };
