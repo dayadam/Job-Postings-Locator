@@ -24,66 +24,70 @@
   <div id="map"></div>
   <script>
     function initMap() {
-      var uluru = { lat: 33.7632, lng: -84.4231 };
+      var Atlanta = { lat: 33.7632, lng: -84.4231 };
       var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15,
-        center: uluru
+        zoom: 10,
+        center: Atlanta
       });
       var array = [
-        { jobTitle: "Ops", companyName: "Coke", salaryGrade: 5, description: "fun for all", location: { lat: 33.7632, Lng: -84.4231 } }];
-      var job = array[0].jobTitle;
-      console.log(job);
-      var company = array[0].companyName;
-      var salary = array[0].salaryGrade;
-      var desc = array[0].description;
-      var atlanta = array[0].location;
+        { jobTitle: "Ops", companyName: "Coke", salaryGrade: 5, description: "fun for all", location: { lat: 33.7632, lng: -84.4231 } },
+        { jobTitle: "Opsii", companyName: "Coke", salaryGrade: 5, description: "fun for all", location: { lat: 33.8632, lng: -84.3231 } },
+        { jobTitle: "Opsii3", companyName: "Coke", salaryGrade: 5, description: "fun for all", location: { lat: 33.9632, lng: -84.2231 } }];
+      for (i = 0; i < array.length; i++) {
+        var atlanta = array[i].location;
+        var marker = new google.maps.Marker({
+          position: atlanta,
+          map: map,
+          title: 'Atlanta' + i
+        });
+        var job = array[i].jobTitle;
+        var company = array[i].companyName;
+        var salary = array[i].salaryGrade;
+        var desc = array[i].description;
+        var content = '<div id="content">' +
+          '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
+          '<div id="bodyContent">' +
+          '<p>' + company + '</p>' +
+          '<p>' + salary + '</p>' +
+          '<p>' + desc + '</p>' +
+          '</div>' +
+          '</div>';
+        marker.content = content;
+        var infowindow = new google.maps.InfoWindow();
+        google.maps.event.addListener(marker, 'click', function () {
+          infowindow.setContent(this.content)
+          infowindow.open(map, this)
+        });
+        // google.maps.event.addListener(marker, 'click', (function(marker, content, infoWindow) {
+        //   return function () {
+        //     infoWindow.setContent(content);
+        //     infoWindow.open(map, marker)
+        //   }
+        // })(marker, content, infowindow))
+      };
 
-
-      var contentString = '<div id="content">' +
-        '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
-        '<div id="bodyContent">' +
-        '<p>' + company + '</p>' +
-        '<p>' + salary + '</p>' +
-        '<p>' + desc + '</p>'
-      '</div>' +
-        '</div>';
-
-      var infowindow = new google.maps.InfoWindow({
-        content: contentString
-      });
-
-      var marker = new google.maps.Marker({
-        position: uluru,
-        map: map,
-        title: 'Atlanta'
-      });
-      marker.addListener('click', function () {
-        infowindow.open(map, marker);
-      });
-    }
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        var pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-      }, function () {
-        handleLocationError(true, infoWindow, map.getCenter());
-      });
-    } else {
-      // Browser doesn't support Geolocation
-      handleLocationError(false, infoWindow, map.getCenter());
-    }
-    
-
-    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-      infoWindow.setPosition(pos);
-      infoWindow.setContent(browserHasGeolocation ?
-        'Error: The Geolocation service failed.' :
-        'Error: Your browser doesn\'t support geolocation.');
-      infoWindow.open(map);
-    }
-
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          map.setCenter(pos);
+        }, function () {
+          handleLocationError(true, infoWindow, map.getCenter());
+        });
+      } else {
+        // Browser doesn't support Geolocation
+        handleLocationError(false, infoWindow, map.getCenter());
+      }
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+          'Error: The Geolocation service failed.' :
+          'Error: Your browser doesn\'t support geolocation.');
+        infoWindow.open(map);
+      }
+    };
   </script>
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBC9qQqk5oXjKL6xXIPcgi525Rg9yqqXa8&callback=initMap">
