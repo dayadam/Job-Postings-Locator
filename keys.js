@@ -6,3 +6,7 @@ exports.linkedIn = {
 exports.jooble = {
   apiKey: process.env.JOOBLE_API_KEY
 };
+
+exports.google = {
+  
+}
