@@ -2,18 +2,18 @@ const db = require("../models");
 
 const passport = require("../config/passport");
 const axios = require("axios");
-const keys = require("../keys.js");
-const joobleKey = keys.jooble.apiKey;
-const googleKey = keys.google.apiKey;
-/// there keys arent loading
+const keys = require("../keys");
+const joobleKey = process.env.JOOBLE_API;
+const googleKey = process.env.GOOGLE_API;
+
 module.exports = function(app) {
     app.get("/api/job-search", function(req, res) {
         const URL = `https://jooble.org/api/${joobleKey}`;
-        console.log(URL);
+
         axios
             .post(URL, {
                 keywords: "javascript",
-                location: "Atlanta",
+                location: "London",
                 radius: "25",
                 salary: "100000",
                 page: "1"
@@ -43,17 +43,16 @@ module.exports = function(app) {
 
     //get jobs
     app.get("/api/search", function(req, res) {
-        console.log(joobleKey);
         axios
             .post(`https://jooble.org/api/${joobleKey}`, {
-                keywords: "account manager",
-                location: "Tampa",
+                keywords: "Front End Developer",
+                location: "Atlanta",
                 radius: "50",
-                salary: "200000",
-                page: "1"
+
+                page: "1",
+                searchMode: "1"
             })
             .then(function(response) {
-                console.log(response.data.jobs);
                 return companyToLoc(response.data.jobs);
             })
             .then(function(jobs) {
@@ -89,11 +88,13 @@ module.exports = function(app) {
     });
 
     async function companyToLoc(jobs) {
+        const city = "Atlanta";
         const locationRequests = [];
+        console.log(googleKey);
         for (let i = 0; i < jobs.length; i++) {
             const companyName = encodeURI(jobs[i].company);
-            const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName}&inputtype=textquery&fields=formatted_address,name,rating,opening_hours,geometry&locationbias=circle:2000@27.9506,-82.4572&key=${googlekey}`;
-
+            const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName},${city}&inputtype=textquery&fields=formatted_address,geometry&key=${googleKey}`;
+            console.log(urlString);
             const locationReq = axios.get(urlString).then(function(response) {
                 let location = {};
                 console.log(response.data.status);
