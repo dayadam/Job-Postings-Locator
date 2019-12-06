@@ -5,7 +5,7 @@
 .form-control-sm {
   margin-bottom: 20px;
 }
-body {
+/* body {
   font-size: 1rem;
   line-height: 1.5;
   text-align: left;
@@ -16,10 +16,14 @@ body {
   margin-bottom: 80px;
   margin-right: 900px;
   margin-left: 150px;
-}
+} */
 .btn-primary {
   width: 295px;
 }
 .simple-search {
   text-align: right;
+}
+#form {
+  float: left;
+  padding: 10px;
 }

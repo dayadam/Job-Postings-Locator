@@ -18,10 +18,44 @@
       padding: 0;
     }
   </style>
+  <link rel="stylesheet" type="text/css" href="style/style.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
 </head>
 
 <body>
-  <div id="map"></div>
+  <div id=form>
+    <div class="heading">
+      <h2 class="title">Job Site</h2>
+      <p class="description">A map based job search powered by Jooble</p>
+    </div>
+    <form>
+      <label for="keywords">Job title</label>
+      <input id="keywords" type="text" class="form-control form-control-sm">
+
+      <label for="location">Location</label>
+      <input id="location" type="text" class="form-control form-control-sm">
+
+      <label for="radius">Radius</label>
+      <input id="radius" type="text" class="form-control form-control-sm">
+
+      <label for="radius">Hours per Week</label>
+      <input id="Hours" type="text" class="form-control form-control-sm">
+
+      <label for="radius">Salary</label>
+      <input id="location" type="text" class="form-control form-control-sm">
+
+      <input type="checkbox" aria-label="Checkbox for following text input" />
+      <label class="form-check-label" for="dropdownCheck">
+        Exclude staffing agencies
+        <div class="search-button">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+  </div>
+  </form>
+  </div>
+  <div id="map">
+  </div>
   <script>
     function initMap() {
       var Atlanta = { lat: 33.7632, lng: -84.4231 };
