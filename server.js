@@ -9,6 +9,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 // Sets up the Express App
 // =============================================================
@@ -26,9 +27,19 @@ app.use(express.json());
 app.use(express.static("public"));
 
 //initializing session
+const sessionStore = new SequelizeStore({
+    db: db.sequelize
+});
+
 app.use(
-    session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
+    session({
+        secret: "keyboard cat",
+        store: sessionStore,
+        resave: false,
+        saveUninitialized: false
+    })
 );
+sessionStore.sync();
 app.use(passport.initialize());
 app.use(passport.session());
 
