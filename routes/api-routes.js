@@ -7,7 +7,7 @@ const googleKey = process.env.GOOGLE_API_KEY;
 module.exports = function(app) {
 //get jobs with location data
 app.put("/api/search", function(req, res) {
-    console.log(googleKey)
+    console.log(googleKey);
     const searchLoc = req.body.location;
     const jobs = {};
     axios
@@ -110,6 +110,7 @@ async function companyToLoc(res, jobs, searchLoc, keywords) {
     for (let i = 0; i < jobs.length; i++) {
         const companyName = encodeURI(jobs[i].company);
         const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName},${searchLoc}&inputtype=textquery&fields=formatted_address,geometry&key=${googleKey}`;
+        console.log(urlString);
         const locationReq = axios.get(urlString).then(function(response) {
             let location = {};
             if (response.data.status !== "ZERO_RESULTS") {
