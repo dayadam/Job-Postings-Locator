@@ -30,7 +30,7 @@ module.exports = function(app) {
                 res.json(jobs);
             })
             .catch(function(err) {
-                console.log("timed out sending cached data");
+                console.log("sending cached data!");
                 getCacheData(res, searchLoc, req.body.keywords, jobs);
             });
     });
