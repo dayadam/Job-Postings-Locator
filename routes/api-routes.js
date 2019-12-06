@@ -7,7 +7,7 @@ const googleKey = process.env.GOOGLE_API_KEY;
 module.exports = function(app) {
     //get jobs with location data
     app.put("/api/search", function(req, res) {
-        console.log(googleKey);
+
         const searchLoc = req.body.location;
         const jobs = {};
         axios
@@ -30,10 +30,10 @@ module.exports = function(app) {
             .then(function(jobs) {
                 res.json(jobs);
             });
-        // .catch(function(err) {
-        //     console.log("sending cached data!");
-        //     getCacheData(res, searchLoc, req.body.keywords, jobs);
-        //});
+        .catch(function(err) {
+            console.log("sending cached data!");
+            getCacheData(res, searchLoc, req.body.keywords, jobs);
+        });
     });
     //get jobs without location data this link isnt really need the /api/search will
     // send this info if it cant find it in db or api call. this is for testing
