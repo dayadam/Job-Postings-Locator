@@ -141,6 +141,7 @@
         }).then(function (answer) {
           console.log(answer);
           if (answer[0].location.lat) {
+            map.setCenter( { lat: answer[0].location.lat, lng: answer[0].location.lng });
             displayPoints(answer);
           }
         });
