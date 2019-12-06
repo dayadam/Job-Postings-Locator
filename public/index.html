@@ -78,12 +78,14 @@
         var company = array[i].companyName;
         var salary = array[i].salaryGrade;
         var desc = array[i].description;
+       
         var content = '<div id="content">' +
           '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
           '<div id="bodyContent">' +
           '<p>' + company + '</p>' +
           '<p>' + salary + '</p>' +
           '<p>' + desc + '</p>' +
+          '<p>' + URL + '</p>' +
           '</div>' +
           '</div>';
         marker.content = content;
