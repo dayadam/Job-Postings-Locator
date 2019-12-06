@@ -90,6 +90,7 @@ module.exports = function(app) {
         req.logout();
         res.redirect("/");
     });
+
     // main bulk of the app, its async because we need to make multiple calls to google places
     // we need them all to return before we move on.
     async function companyToLoc(res, jobs, searchLoc, keywords) {
@@ -103,7 +104,7 @@ module.exports = function(app) {
             if (dataSent === false) {
                 getCacheData(res, searchLoc, keywords, jobs);
             }
-        }, 2000);
+        }, 30000);
         //takes the incoming jobs and makes a call to the google places api thehn adds the log / lat to the object
         for (let i = 0; i < jobs.length; i++) {
             const companyName = encodeURI(jobs[i].company);
