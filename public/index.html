@@ -51,74 +51,20 @@
     <div id="map">
     </div>
     <script>
+        let map;
+        let infowindow;
+
         function initMap() {
             var Atlanta = {
                 lat: 33.7632,
                 lng: -84.4231
             };
-            var map = new google.maps.Map(document.getElementById('map'), {
+            map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 10,
                 center: Atlanta
             });
-            var infowindow = new google.maps.InfoWindow();
-            var array = [{
-                jobTitle: "Ops",
-                companyName: "Coke",
-                salaryGrade: 5,
-                description: "fun for all",
-                location: {
-                    lat: 33.7632,
-                    lng: -84.4231
-                }
-            }, {
-                jobTitle: "Opsii",
-                companyName: "Coke",
-                salaryGrade: 5,
-                description: "fun for all",
-                location: {
-                    lat: 33.8632,
-                    lng: -84.3231
-                }
-            }, {
-                jobTitle: "Opsii3",
-                companyName: "Coke",
-                salaryGrade: 5,
-                description: "fun for all",
-                location: {
-                    lat: 33.9632,
-                    lng: -84.2231
-                }
-            }];
-
-            function displayPoints(array) {
-                for (i = 0; i < array.length; i++) {
-                    var atlanta = array[i].location;
-                    var marker = new google.maps.Marker({
-                        position: atlanta,
-                        map: map,
-                        title: 'Atlanta' + i
-                    });
-                    var job = array[i].jobTitle;
-                    var company = array[i].companyName;
-                    var salary = array[i].salaryGrade;
-                    var desc = array[i].description;
-
-                    var content = '<div id="content">' +
-                        '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
-                        '<div id="bodyContent">' +
-                        '<p>' + company + '</p>' +
-                        '<p>' + salary + '</p>' +
-                        '<p>' + desc + '</p>' +
-                        '<p>' + URL + '</p>' +
-                        '</div>' +
-                        '</div>';
-                    marker.content = content;
-                    google.maps.event.addListener(marker, 'click', function() {
-                        infowindow.setContent(this.content)
-                        infowindow.open(map, this)
-                    });
-                };
-            };
+            infowindow = new google.maps.InfoWindow();
+            var array = [];
             displayPoints(array);
 
 
@@ -145,7 +91,41 @@
                 infoWindow.open(map);
             }
         }
-        $(".search").click(function() {
+
+        function displayPoints(array) {
+            for (i = 0; i < array.length; i++) {
+                var atlanta = array[i].location;
+                var marker = new google.maps.Marker({
+                    position: {
+                        lat: array[i].location.lat,
+                        lng: array[i].location.lng
+                    },
+                    map: map,
+                    title: 'Atlanta' + i
+                });
+                var job = array[i].title;
+                var company = array[i].company;
+                var salary = array[i].salary;
+                var desc = array[i].snippet;
+
+                var content = '<div id="content">' +
+                    '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
+                    '<div id="bodyContent">' +
+                    '<p>' + company + '</p>' +
+                    '<p>' + salary + '</p>' +
+                    '<p>' + desc + '</p>' +
+                    '<p>' + URL + '</p>' +
+                    '</div>' +
+                    '</div>';
+
+                marker.content = content;
+                google.maps.event.addListener(marker, 'click', function() {
+                    infowindow.setContent(this.content)
+                    infowindow.open(map, this)
+                });
+            };
+        };
+        $(document).on("click", ".search", function() {
             const search = {};
             if ($("#location").val() !== "") {
                 search.location = $("#location").val();
@@ -158,7 +138,6 @@
             if ($("#salary").val() !== "") {
                 search.salary = $("#salary").val();
             }
-            console.log(search);
             if ($("#keywords").val() !== "") {
                 search.keywords = $("#keywords").val();
                 console.log(search);
@@ -166,10 +145,15 @@
                     url: "/api/search",
                     method: "PUT",
                     data: search
-                        //data: search
                 }).then(function(answer) {
                     console.log(answer);
-                    //displayPoints(answer);
+                    if (answer[0].location.lat) {
+                        map.setCenter({
+                            lat: answer[0].location.lat,
+                            lng: answer[0].location.lng
+                        });
+                        displayPoints(answer);
+                    }
                 });
             }
         });
