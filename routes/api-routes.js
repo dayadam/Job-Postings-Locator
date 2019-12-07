@@ -1,6 +1,8 @@
 const db = require("../models");
 const passport = require("../config/passport");
 const axios = require("axios");
+const rateLimit = require("axios-rate-limit");
+const http = rateLimit(axios.create(), { maxRequests: 20, perMilliseconds: 2000, maxRPS: 10 })
 //set these in .env file
 const joobleKey = process.env.JOOBLE_API_KEY;
 const googleKey = process.env.GOOGLE_API_KEY;
@@ -110,7 +112,7 @@ module.exports = function(app) {
             const companyName = encodeURI(jobs[i].company);
             const urlString = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${companyName},${searchLoc}&inputtype=textquery&fields=formatted_address,geometry&key=${googleKey}`;
             console.log(urlString);
-            const locationReq = axios.get(urlString).then(function(response) {
+            const locationReq = http.get(urlString).then(function(response) {
                 let location = {};
                 if (response.data.status !== "ZERO_RESULTS") {
                     location.address = response.data.candidates[0].formatted_address;

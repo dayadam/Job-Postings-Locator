@@ -1,165 +1,188 @@
 <!DOCTYPE html>
 
 <html>
-
-<head>
+  <head>
     <title>Geolocation</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8" />
     <style>
-        #map {
-            height: 100%;
-        }
-        
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+      #map {
+        height: 100%;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
     </style>
-    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href="style/style.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
-</head>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.js"
+      integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" type="text/css" href="style/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+  </head>
 
-<body>
-    <div id=form>
-        <div class="heading">
-            <h2 class="title">Job Site</h2>
-            <p class="description">A map based job search powered by Jooble</p>
+  <body>
+    <div id="form">
+      <div class="heading">
+        <h2 class="title">Job Site</h2>
+        <p class="description">A map based job search powered by Jooble</p>
+      </div>
+      <form>
+        <label for="keywords">Job title</label>
+        <input id="keywords" type="text" class="form-control form-control-sm" />
+
+        <label for="location">Location</label>
+        <input id="location" type="text" class="form-control form-control-sm" />
+
+        <label for="radius">Radius</label>
+        <input id="radius" type="text" class="form-control form-control-sm" />
+
+        <label for="radius">Salary</label>
+        <input id="location" type="text" class="form-control form-control-sm" />
+
+        <div class="search-button">
+          <button type="button" class="btn btn-success search">Search</button>
         </div>
-        <form>
-            <label for="keywords">Job title</label>
-            <input id="keywords" type="text" class="form-control form-control-sm">
-
-            <label for="location">Location</label>
-            <input id="location" type="text" class="form-control form-control-sm">
-
-            <label for="radius">Radius</label>
-            <input id="radius" type="text" class="form-control form-control-sm">
-
-            <label for="radius">Salary</label>
-            <input id="location" type="text" class="form-control form-control-sm">
-
-            <div class="search-button">
-                <button type="button" class="btn btn-success search">Search</button>
-            </div>
+      </form>
     </div>
-    </form>
-    </div>
-    <div id="map">
-    </div>
+    <div id="map"></div>
     <script>
-        let map;
-        let infowindow;
+      let map;
+      let infowindow;
 
-        function initMap() {
-            var Atlanta = {
-                lat: 33.7632,
-                lng: -84.4231
-            };
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 10,
-                center: Atlanta
-            });
-            infowindow = new google.maps.InfoWindow();
-            var array = [];
-            displayPoints(array);
+      function initMap() {
+        var Atlanta = {
+          lat: 33.7632,
+          lng: -84.4231
+        };
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 10,
+          center: Atlanta
+        });
+        infowindow = new google.maps.InfoWindow();
+        var array = [];
+        displayPoints(array);
 
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var pos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    map.setCenter(new google.maps.LatLng(pos));
-                }, function() {
-                    handleLocationError(true, infoWindow, map.getCenter());
-                });
-            } else {
-                // Browser doesn't support Geolocation
-                handleLocationError(false, infoWindow, map.getCenter());
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function(position) {
+              var pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              map.setCenter(new google.maps.LatLng(pos));
+            },
+            function() {
+              handleLocationError(true, infoWindow, map.getCenter());
             }
-
-            function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-                infoWindow.setPosition(pos);
-                infoWindow.setContent(browserHasGeolocation ?
-                    'Error: The Geolocation service failed.' :
-                    'Error: Your browser doesn\'t support geolocation.');
-                infoWindow.open(map);
-            }
+          );
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
         }
 
-        function displayPoints(array) {
-            for (i = 0; i < array.length; i++) {
-                var atlanta = array[i].location;
-                var marker = new google.maps.Marker({
-                    position: {
-                        lat: array[i].location.lat,
-                        lng: array[i].location.lng
-                    },
-                    map: map,
-                    title: 'Atlanta' + i
-                });
-                var job = array[i].title;
-                var company = array[i].company;
-                var salary = array[i].salary;
-                var desc = array[i].snippet;
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+          infoWindow.setPosition(pos);
+          infoWindow.setContent(
+            browserHasGeolocation
+              ? "Error: The Geolocation service failed."
+              : "Error: Your browser doesn't support geolocation."
+          );
+          infoWindow.open(map);
+        }
+      }
 
-                var content = '<div id="content">' +
-                    '<h1 id="firstHeading" class="firstHeading">' + job + '</h1>' +
-                    '<div id="bodyContent">' +
-                    '<p>' + company + '</p>' +
-                    '<p>' + salary + '</p>' +
-                    '<p>' + desc + '</p>' +
-                    '<p>' + URL + '</p>' +
-                    '</div>' +
-                    '</div>';
+      function displayPoints(array) {
+        for (i = 0; i < array.length; i++) {
+          var atlanta = array[i].location;
+          var marker = new google.maps.Marker({
+            position: {
+              lat: array[i].location.lat,
+              lng: array[i].location.lng
+            },
+            map: map,
+            title: "Atlanta" + i
+          });
+          var job = array[i].title;
+          var company = array[i].company;
+          var salary = array[i].salary;
+          var desc = array[i].snippet;
 
-                marker.content = content;
-                google.maps.event.addListener(marker, 'click', function() {
-                    infowindow.setContent(this.content)
-                    infowindow.open(map, this)
-                });
-            };
-        };
-        $(document).on("click", ".search", function() {
-            const search = {};
-            if ($("#location").val() !== "") {
-                search.location = $("#location").val();
+          var content =
+            '<div id="content">' +
+            '<h1 id="firstHeading" class="firstHeading">' +
+            job +
+            "</h1>" +
+            '<div id="bodyContent">' +
+            "<p>" +
+            company +
+            "</p>" +
+            "<p>" +
+            salary +
+            "</p>" +
+            "<p>" +
+            desc +
+            "</p>" +
+            "<p>" +
+            URL +
+            "</p>" +
+            "</div>" +
+            "</div>";
+
+          marker.content = content;
+          google.maps.event.addListener(marker, "click", function() {
+            infowindow.setContent(this.content);
+            infowindow.open(map, this);
+          });
+        }
+      }
+      $(document).on("click", ".search", function() {
+        const search = {};
+        if ($("#location").val() !== "") {
+          search.location = $("#location").val();
+        }
+        if ($("#radius").val() !== "") {
+          search.radius = $("#radius").val();
+        } else {
+          search.radius = 25;
+        }
+        if ($("#salary").val() !== "") {
+          search.salary = $("#salary").val();
+        }
+        if ($("#keywords").val() !== "") {
+          search.keywords = $("#keywords").val();
+          console.log(search);
+          $.ajax({
+            url: "/api/search",
+            method: "PUT",
+            data: search
+          }).then(function(answer) {
+            console.log(answer);
+            if (answer[0].location.lat) {
+              map.setCenter({
+                lat: answer[0].location.lat,
+                lng: answer[0].location.lng
+              });
+              displayPoints(answer);
             }
-            if ($("#radius").val() !== "") {
-                search.radius = $("#radius").val();
-            } else {
-                search.radius = 25;
-            }
-            if ($("#salary").val() !== "") {
-                search.salary = $("#salary").val();
-            }
-            if ($("#keywords").val() !== "") {
-                search.keywords = $("#keywords").val();
-                console.log(search);
-                $.ajax({
-                    url: "/api/search",
-                    method: "PUT",
-                    data: search
-                }).then(function(answer) {
-                    console.log(answer);
-                    if (answer[0].location.lat) {
-                        map.setCenter({
-                            lat: answer[0].location.lat,
-                            lng: answer[0].location.lng
-                        });
-                        displayPoints(answer);
-                    }
-                });
-            }
-        });
+          });
+        }
+      });
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBC9qQqk5oXjKL6xXIPcgi525Rg9yqqXa8&callback=initMap">
-    </script>
-</body>
-
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvIpYdiO26obBX-KpHld49whdMDCiysE4&callback=initMap"
+    ></script>
+  </body>
 </html>
