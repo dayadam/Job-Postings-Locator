@@ -22,6 +22,16 @@
       integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
       crossorigin="anonymous"
     ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
     <link rel="stylesheet" type="text/css" href="style/style.css" />
     <link
       rel="stylesheet"
@@ -39,26 +49,48 @@
       </div>
       <form>
         <label for="keywords">Job title</label>
-        <input id="keywords" type="text" class="form-control form-control-sm" />
+        <input
+          id="keywords"
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Ex. Nurse"
+        />
 
         <label for="location">Location</label>
-        <input id="location" type="text" class="form-control form-control-sm" />
+        <input
+          id="location"
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Ex. Boston"
+        />
 
-        <label for="radius">Radius</label>
-        <input id="radius" type="text" class="form-control form-control-sm" />
+        <label for="radius">Radius (in miles)</label>
+        <input
+          id="radius"
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Default: 25 miles"
+        />
 
         <label for="radius">Salary</label>
-        <input id="location" type="text" class="form-control form-control-sm" />
+        <input
+          id="location"
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Ex. 50000 - 75000"
+        />
 
         <div class="search-button">
           <button type="button" class="btn btn-success search">Search</button>
         </div>
       </form>
+      <a href="https://simplemaps.com/data/us-cities">City database</a>
     </div>
     <div id="map"></div>
     <script>
       let map;
       let infowindow;
+      var gmarkers = [];
 
       function initMap() {
         var Atlanta = {
@@ -70,8 +102,6 @@
           center: Atlanta
         });
         infowindow = new google.maps.InfoWindow();
-        var array = [];
-        displayPoints(array);
 
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -102,16 +132,23 @@
         }
       }
 
+      function removeMarkers() {
+        for (i = 0; i < gmarkers.length; i++) {
+          gmarkers[i].setMap(null);
+        }
+        gmarkers = [];
+      }
+
       function displayPoints(array) {
+        removeMarkers();
         for (i = 0; i < array.length; i++) {
-          var atlanta = array[i].location;
           var marker = new google.maps.Marker({
             position: {
               lat: array[i].location.lat,
               lng: array[i].location.lng
             },
             map: map,
-            title: "Atlanta" + i
+            title: array[i].title
           });
           var job = array[i].title;
           var company = array[i].company;
@@ -120,9 +157,9 @@
 
           var content =
             '<div id="content">' +
-            '<h1 id="firstHeading" class="firstHeading">' +
+            '<h3 id="firstHeading" class="firstHeading">' +
             job +
-            "</h1>" +
+            "</h3>" +
             '<div id="bodyContent">' +
             "<p>" +
             company +
@@ -133,9 +170,6 @@
             "<p>" +
             desc +
             "</p>" +
-            "<p>" +
-            URL +
-            "</p>" +
             "</div>" +
             "</div>";
 
@@ -144,9 +178,13 @@
             infowindow.setContent(this.content);
             infowindow.open(map, this);
           });
+          gmarkers.push(marker);
         }
       }
       $(document).on("click", ".search", function() {
+        $(".search-button").append(`<div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>`);
         const search = {};
         if ($("#location").val() !== "") {
           search.location = $("#location").val();
@@ -168,13 +206,18 @@
             data: search
           }).then(function(answer) {
             console.log(answer);
-            if (answer[0].location.lat) {
-              map.setCenter({
-                lat: answer[0].location.lat,
-                lng: answer[0].location.lng
-              });
-              displayPoints(answer);
+            let mapSet = false;
+            for (i = 0; i < answer.length; i++) {
+              if (answer[i].location.lat && mapSet === false) {
+                map.setCenter({
+                  lat: answer[i].location.lat,
+                  lng: answer[i].location.lng
+                });
+                mapSet = true;
+              }
             }
+            displayPoints(answer);
+            $(".spinner-border").remove();
           });
         }
       });

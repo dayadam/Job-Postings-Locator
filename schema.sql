@@ -9,3 +9,8 @@ USE joblocator;
 SHOW TABLES;
 
 SELECT * FROM users;
+
+SELECT * FROM searches;
+
+SELECT * FROM sessions;
+

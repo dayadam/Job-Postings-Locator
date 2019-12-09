@@ -2,7 +2,7 @@ const db = require("../models");
 const passport = require("../config/passport");
 const axios = require("axios");
 const rateLimit = require("axios-rate-limit");
-const http = rateLimit(axios.create(), { maxRequests: 20, perMilliseconds: 2000, maxRPS: 10 })
+const http = rateLimit(axios.create(), { maxRPS: 10 })
 //set these in .env file
 const joobleKey = process.env.JOOBLE_API_KEY;
 const googleKey = process.env.GOOGLE_API_KEY;
