@@ -84,6 +84,18 @@
           <button type="button" class="btn btn-success search">Search</button>
         </div>
       </form>
+      <h3>Login</h3>
+      <form id="login">
+        <input type="email" name="email" placeholder="email" />
+        <input type="password" name="password" placeholder="password" />
+        <input type="submit" name="login" />
+      </form>
+      <h3>New User</h3>
+      <form id="new-user">
+        <input type="email" name="email" placeholder="email" />
+        <input type="password" name="password" placeholder="password" />
+        <input type="submit" name="login" />
+      </form>
       <a href="https://simplemaps.com/data/us-cities">City database</a>
     </div>
     <div id="map"></div>
@@ -132,6 +144,30 @@
         }
       }
 
+      function createUser(user) {
+        $.post({
+          type: "POST",
+          url: "/api/signup",
+          data: user
+        }).then(function(data) {
+          window.location.replace(data);
+        });
+      }
+
+      function loginUser(email, password) {
+        $.post("/api/login", {
+          email: email,
+          password: password
+        })
+          .then(function(data) {
+            window.location.replace(data);
+            // If there's an error, log the error
+          })
+          .catch(function(err) {
+            console.log(err);
+          });
+      }
+
       function removeMarkers() {
         for (i = 0; i < gmarkers.length; i++) {
           gmarkers[i].setMap(null);
@@ -157,9 +193,9 @@
 
           var content =
             '<div id="content">' +
-            '<h3 id="firstHeading" class="firstHeading">' +
+            '<h4 id="firstHeading" class="firstHeading">' +
             job +
-            "</h3>" +
+            "</h4>" +
             '<div id="bodyContent">' +
             "<p>" +
             company +
@@ -181,45 +217,69 @@
           gmarkers.push(marker);
         }
       }
-      $(document).on("click", ".search", function() {
-        $(".search-button").append(`<div class="spinner-border" role="status">
+      $(document).ready(function() {
+        $("#login").on("submit", function() {
+          event.preventDefault();
+          const user = {};
+          user.email = $("input[name='email']", this).val();
+          user.password = $("input[name='password']", this).val();
+          //make sure they filled out the form
+          if (!user.email || !user.password) {
+            return;
+          }
+          //runs the login function and clears the form
+          loginUser(user.email, user.password);
+          $("#login").trigger("reset");
+        });
+
+        $("#new-user").on("submit", function() {
+          event.preventDefault();
+          const user = {};
+          user.email = $("input[name='email']", this).val();
+          user.password = $("input[name='password']", this).val();
+          console.log(user);
+          createUser(user);
+        });
+        $(document).on("click", ".search", function() {
+          $(".search-button").append(`<div class="spinner-border" role="status">
           <span class="sr-only">Loading...</span>
         </div>`);
-        const search = {};
-        if ($("#location").val() !== "") {
-          search.location = $("#location").val();
-        }
-        if ($("#radius").val() !== "") {
-          search.radius = $("#radius").val();
-        } else {
-          search.radius = 25;
-        }
-        if ($("#salary").val() !== "") {
-          search.salary = $("#salary").val();
-        }
-        if ($("#keywords").val() !== "") {
-          search.keywords = $("#keywords").val();
-          console.log(search);
-          $.ajax({
-            url: "/api/search",
-            method: "PUT",
-            data: search
-          }).then(function(answer) {
-            console.log(answer);
-            let mapSet = false;
-            for (i = 0; i < answer.length; i++) {
-              if (answer[i].location.lat && mapSet === false) {
-                map.setCenter({
-                  lat: answer[i].location.lat,
-                  lng: answer[i].location.lng
-                });
-                mapSet = true;
+          const search = {};
+          if ($("#location").val() !== "") {
+            search.location = $("#location").val();
+          }
+          if ($("#radius").val() !== "") {
+            search.radius = $("#radius").val();
+          } else {
+            search.radius = 25;
+          }
+          if ($("#salary").val() !== "") {
+            search.salary = $("#salary").val();
+          }
+          if ($("#keywords").val() !== "") {
+            search.keywords = $("#keywords").val();
+            console.log(search);
+            $.ajax({
+              url: "/api/search",
+              method: "PUT",
+              data: search
+            }).then(function(answer) {
+              console.log(answer);
+              let mapSet = false;
+              for (i = 0; i < answer.length; i++) {
+                if (answer[i].location.lat && mapSet === false) {
+                  map.setCenter({
+                    lat: answer[i].location.lat,
+                    lng: answer[i].location.lng
+                  });
+                  mapSet = true;
+                }
               }
-            }
-            displayPoints(answer);
-            $(".spinner-border").remove();
-          });
-        }
+              displayPoints(answer);
+              $(".spinner-border").remove();
+            });
+          }
+        });
       });
     </script>
     <script
